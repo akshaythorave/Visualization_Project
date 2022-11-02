@@ -1,0 +1,155 @@
+---
+title: "**Analytics Report: Honey Production In USA(1998-2012)**"
+author: "**Name: Akshay Thorave    Roll No: MDS202247**"
+output: pdf_document
+date: "**2022-10-30**"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## INTRODUCTION
+In 2006, global concern was raised over the rapid decline in the honeybee population, an integral component of American honey agriculture.  Large number of hives were lost to Colony Collapse disorder, a phenomenon of disappearing worker bees causing the remaining hive colony to collapse. Later, some industries observed recovery, but the American honey industry is still struggling. The U.S. used to locally produce over half the honey it consumes yearly. Now, honey mostly comes from overseas.This dataset provides insight into honey production in America by state from 1998 to 2012. We will try to visualize this data using different packages in R like 'ggplot' and 'ggplot2'.
+
+
+## ABOUT THE DATA SET
+
+The dataset gives information about 'Honey Production' in the states of America from 1998 to 2012. In this dataset, there are a total of 8 variables out of which 7 are 'Numeric' variables and 1 'Categorical' variable:
+
+
+   
+## WORKING VARIABLES
+
+```{r}
+VariableName = c('state', 'numcol', 'yieldpercol', 'totalprod', 'stocks' ,'priceperlb' ,'prodvalue','year')
+VariableType = c('Categoric(Nominal)', 'Numeric(Discrete)', 'Numeric(Discrete)','Numeric(Discrete)', 'Numeric(Discrete)', 'Numeric(Continuous)', 'Numeric(Continuous)','Numeric(Discrete)')
+Description = c("State In USA","No. of honey producing colonies","Honey Yield Per Colony(In Pounds)","Total Honey Production(numcol * yieldpercol)(In Pounds)","Stocks held by producers(In Pounds)","Average price per Pound(In Dollars)","Value of Production(totalprod * priceperlb)(In Dollars)","Year")
+variable = data.frame(VariableName, VariableType, Description )
+
+knitr::kable(variable, "pipe", col.name = c('VariableName', 'VariableType','Description'), align = c("l","c","c"))
+```
+
+## OBJECTIVE OF THE PROJECT
+
+The main objective of this project is to 'Develop An Analytics Dashboard' using the  R-Shiny application for the above dataset.
+
+
+
+
+```{r,  echo=FALSE, include= FALSE}
+library(tidyverse)
+library(descriptr)
+library(ggpubr)
+library("viridis") 
+
+data = read.csv('honeyproduction.csv')
+
+
+```
+## 1) Statewise Honey Production For The Year 1998.
+
+
+```{r}
+data1 = filter(data,year == '1998')
+
+ggplot(data1,aes(reorder(state,-totalprod),totalprod))+
+   geom_col(fill = 'orange')+
+   labs(title = 'Statewise total production of honey(in Pounds) for the year 1998',
+       x = 'States',y = 'Total production(Pounds)')+
+   theme(axis.text.x = element_text(angle = 90) )
+
+```
+
+From the above graph we can observe that;
+
+1) California, North Dakota, Florida, and South Dakota are the top 4 honey producing    states for the year 1998. They are approximately producing half of the total honey    production of the USA for the year 1998.
+
+2) On the other hand, Kentucky and Oklahoma are the least honey-producing states for    the year 1998.
+
+
+
+
+
+## 2) Stocks vs Price per Pound of Honey for different states in the year 1998.
+
+
+
+
+```{r}
+
+
+ggplot(data1,aes(x = stocks, y = priceperlb))+
+   geom_point(aes(color = 'stocks'),size = 2)+
+   labs(title = 'Stocks VS Price per lb in the year 1998')+
+   xlab('Honeystock(in pounds)')+
+   ylab('Price per lb(in Dollars)')
+
+```
+From the above plot it is easy to observe that,
+
+1) In 1998, Honeystock in most of the states is less than 2500000 pounds.
+
+2) The price of honey per pound is decreasing with an increase in honey stock. It           means, the price per pound of honey is more when honey stock is less and vice            versa.
+
+3) In the year 1998, the price per pound of honey is almost less than 1.5 Dollars           independent of the honey stock.
+
+
+
+
+
+
+
+## 3) Number of colonies in top 5 honey Producing states from 1998-2012.
+
+
+
+
+```{r message=FALSE}
+df_topstate = data %>% 
+   group_by(state) %>% 
+   summarise(mean_prod = mean(totalprod), .groups = 'drop')
+
+df_topstate1 = df_topstate[order(df_topstate$mean_prod,decreasing = TRUE),]
+
+df_topstate2 = df_topstate1[1:5,]$state
+
+ggplot(data[data$state %in% df_topstate2,], aes(year,numcol, color = state))+
+   geom_smooth( se = FALSE)+
+   labs(title = 'No. of colonies in top 5 honey Producing states from 1998-2012')
+
+```
+
+The above graph is showing, the number of honey-producing colonies in the top 5 honey-producing states from 1998 to 2012. From this graph, we can observe that,
+
+1) The number of honey-producing colonies in North Dakota state is rapidly increased        over the period whereas, the number of honey-producing colonies is decreasing in         California state after 2003.
+
+2) The number of colonies in Montana state is almost the same every year. The number of     colonies in Florida decreased after 2003 and again increased after 2007. 
+
+3) In South Dakota state, the number of colonies is slightly increasing over the period.
+
+## 4) Boxplot for total production of top ten honey Producing states from 1998-2012.
+
+
+
+```{r}
+df_topstate3 =df_topstate1[1:10,]$state
+
+ggplot(data[data$state %in% df_topstate3,], aes(state,totalprod, fill = state))+
+   geom_boxplot()+
+   labs(title = 'Boxplot for top ten honey Producing states from 1998-2012')+
+   stat_summary(fun = mean, color = 'white')
+
+```
+
+The above plot is a box plot representation of the total production of the top ten honey-producing states from 1998 to 2012. We can observe that,
+
+1) Although the total honey production in California is varying over a wide range, it is    quite symmetric about the median. Like California, total honey production in Texas and    Idaho is also quite symmetric about the median.
+
+2) The highest median honey production is in North Dakota state.
+
+3) 
+
+
+
+
